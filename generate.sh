@@ -4,7 +4,7 @@
 read -p "Enter Project name: " PROJECT_NAME
 
 read -p "Enter PHP version (e.g. 7.4): " PHP_VERSION
-read -p "Enter web server type (e.g. apache): " WEB_SERVER
+read -p "Enter web server type (e.g. apache, nginx): " WEB_SERVER
 read -p "Enter public path ( from root folder e.g. public): " PUBLIC_PATH
 # Prompt user to select database options
 echo "Select database options (separate by comma, e.g. mysql,postgres,mongodb):"
@@ -18,11 +18,8 @@ if [[ $INCLUDE_REDIS_RESPONSE =~ ^[Yy]$ ]]; then
   INCLUDE_REDIS=true
 fi
 
-# Prompt user to select virtualhost type
-echo "Select virtualhost type (e.g. apache, nginx):"
-read VIRTUALHOST_TYPE
 # Generate Apache virtualhost configuration file
-if [[ $VIRTUALHOST_TYPE == "apache" ]]; then
+if [[ $WEB_SERVER == "apache" ]]; then
   read -p "Enter server name (e.g. example.com): " SERVER_NAME
   VHOST_CONF="./conf/apache-vhost.conf:/etc/apache2/sites-enabled/000-default.conf"
   echo "<VirtualHost *:80>
@@ -35,7 +32,7 @@ if [[ $VIRTUALHOST_TYPE == "apache" ]]; then
 fi
 
 # Generate Nginx virtualhost configuration file
-if [[ $VIRTUALHOST_TYPE == "nginx" ]]; then
+if [[ $WEB_SERVER == "nginx" ]]; then
   read -p "Enter servername (e.g. example.com): " SERVER_NAME
   VHOST_CONF="./conf/nginx-vhost.conf:/etc/nginx/conf.d/default.conf"
   echo "server {
@@ -68,7 +65,7 @@ version: '3'
 services:
   web:
     image: php:${PHP_VERSION}-${WEB_SERVER}
-    container_name:${PROJECT_NAME}-app
+    container_name: ${PROJECT_NAME}-app
     ports:
       - '80:80'
     volumes:
@@ -87,7 +84,7 @@ if [[ $DATABASE_OPTIONS == *mysql* ]]; then
   COMPOSE_FILE+="
   mysql:
     image: mysql:latest
-    container_name:${PROJECT_NAME}-mysql
+    container_name: ${PROJECT_NAME}-mysql
     ports:
       - '3306:3306'
     environment:
@@ -107,7 +104,7 @@ if [[ $DATABASE_OPTIONS == *postgres* ]]; then
   COMPOSE_FILE+="
   postgres:
     image: postgres:latest
-    container_name:${PROJECT_NAME}-postgres
+    container_name: ${PROJECT_NAME}-postgres
     ports:
       - '5432:5432'
     environment:
@@ -123,7 +120,7 @@ if [[ $DATABASE_OPTIONS == *mongodb* ]]; then
   COMPOSE_FILE+="
   mongodb:
     image: mongo:latest
-    container_name:${PROJECT_NAME}-mongo
+    container_name: ${PROJECT_NAME}-mongo
     ports:
       - '27017:27017'
     volumes:
@@ -137,7 +134,7 @@ if [[ $INCLUDE_REDIS == true ]]; then
   COMPOSE_FILE+="
   redis:
     image: redis:latest
-    container_name:${PROJECT_NAME}-redis
+    container_name: ${PROJECT_NAME}-redis
     ports:
       - '6379:6379'
     restart: always
