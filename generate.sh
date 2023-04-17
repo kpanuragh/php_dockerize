@@ -50,7 +50,7 @@ if [[ $WEB_SERVER == "nginx" ]]; then
     location ~ \.php$ {
       include fastcgi_params;
       fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-      fastcgi_pass web:9000;
+      fastcgi_pass ${PROJECT_NAME}-php:9000;
       fastcgi_index index.php;
     }
   }" > conf/nginx-vhost.conf
