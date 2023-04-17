@@ -29,7 +29,7 @@ services:
     ports:
       - '80:80'
     volumes:
-      - ./src:/var/www/html
+      - ../:/var/www/html
       - ./logs:/var/log/${WEB_SERVER}
     restart: always
 "
@@ -95,14 +95,14 @@ if [[ $VIRTUALHOST_TYPE == "apache" ]]; then
   read -p "Enter server name (e.g. example.com): " SERVER_NAME
   APACHE_VHOST_CONF="
   volumes:
-    - ./apache-vhost.conf:/etc/apache2/sites-enabled/000-default.conf
+    - ./conf/apache-vhost.conf:/etc/apache2/sites-enabled/000-default.conf
   "
   echo "<VirtualHost *:80>
     ServerName ${SERVER_NAME}
     DocumentRoot /var/www/html
     ErrorLog /var/log/apache2/error.log
     CustomLog /var/log/apache2/access.log combined
-  </VirtualHost>" > apache-vhost.conf
+  </VirtualHost>" > conf/apache-vhost.conf
   echo "Apache virtualhost configuration file generated:"
   echo "$APACHE_VHOST_CONF"
 fi
@@ -112,7 +112,7 @@ if [[ $VIRTUALHOST_TYPE == "nginx" ]]; then
   read -p "Enter servername (e.g. example.com): " SERVER_NAME
   NGINX_VHOST_CONF="
   volumes:
-    - ./nginx-vhost.conf:/etc/nginx/conf.d/default.conf
+    - ./conf/nginx-vhost.conf:/etc/nginx/conf.d/default.conf
   "
   echo "server {
     listen 80;
@@ -132,7 +132,7 @@ if [[ $VIRTUALHOST_TYPE == "nginx" ]]; then
       fastcgi_pass web:9000;
       fastcgi_index index.php;
     }
-  }" > nginx-vhost.conf
+  }" > conf/nginx-vhost.conf
   echo "Nginx virtualhost configuration file generated:"
   echo "$NGINX_VHOST_CONF"
 fi
