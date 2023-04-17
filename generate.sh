@@ -58,7 +58,7 @@ if [[ $WEB_SERVER == "nginx" ]]; then
 fi
 
 
-
+if [[ $WEB_SERVER == "apache" ]]; then
 # Define the Docker Compose file contents
 COMPOSE_FILE="
 version: '3'
@@ -74,7 +74,31 @@ services:
       - ${VHOST_CONF}
     restart: always
 "
-
+fi
+if [[ $WEB_SERVER == "nginx" ]]; then
+# Define the Docker Compose file contents
+COMPOSE_FILE="
+version: '3'
+services:
+  web:
+    image: nginx:latest 
+    container_name: ${PROJECT_NAME}-app
+    ports:
+      - '80:80'
+    volumes:
+      - ../:/var/www/html
+      - ./logs:/var/log/${WEB_SERVER}
+      - ${VHOST_CONF}
+    restart: always
+  php:
+    image: php:${PHP_VERSION}-fpm
+    container_name: ${PROJECT_NAME}-php
+    ports:
+      - ':9000'
+    volumes:
+        - ../:/var/www/html
+"
+fi
 # Add MySQL service if selected
 if [[ $DATABASE_OPTIONS == *mysql* ]]; then
   read -p "Enter MySQL root password: " MYSQL_ROOT_PASSWORD
