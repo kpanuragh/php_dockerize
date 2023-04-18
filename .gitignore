@@ -4,3 +4,4 @@ logs
 mongo-data
 postgres-data
 mysql-data
+Dockerfile

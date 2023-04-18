@@ -59,12 +59,55 @@ fi
 
 
 if [[ $WEB_SERVER == "apache" ]]; then
+  echo "
+FROM php:${PHP_VERSION}-${WEB_SERVER}
+RUN apt-get update && apt-get install -y \
+    curl \
+    g++ \
+    git \
+    libbz2-dev \
+    libfreetype6-dev \
+    libicu-dev \
+    libjpeg-dev \
+    libonig-dev \
+    libzip-dev \
+    libmcrypt-dev \
+    libpng-dev \
+    libreadline-dev \
+    sudo \
+    unzip \
+    zip \
+ && rm -rf /var/lib/apt/lists/*
+RUN docker-php-ext-install \
+    bcmath \
+    bz2 \
+    calendar \
+    iconv \
+    intl \
+    mbstring \
+    opcache \
+    pdo_mysql \
+    zip
+RUN docker-php-ext-enable \
+    bcmath \
+    bz2 \
+    calendar \
+    iconv \
+    intl \
+    mbstring \
+    opcache \
+    pdo_mysql \
+    zip
+RUN apt-get update && apt-get upgrade -y
+" > Dockerfile
 # Define the Docker Compose file contents
 COMPOSE_FILE="
 version: '3'
 services:
   web:
-    image: php:${PHP_VERSION}-${WEB_SERVER}
+    build:
+       context: .
+       dockerfile: Dockerfile
     container_name: ${PROJECT_NAME}-app
     ports:
       - '80:80'
