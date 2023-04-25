@@ -165,7 +165,7 @@ services:
       dockerfile: Dockerfile
     container_name: ${PROJECT_NAME}-php
     ports:
-      - ':9000'
+      - '9000:9000'
     volumes:
         - ../:/var/www/html
 "
