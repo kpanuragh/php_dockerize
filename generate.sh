@@ -3,9 +3,9 @@
 
 RED="31"
 GREEN="32"
-YELLO="93"
+YELLOW="93"
 BOLDGREEN="\e[1;${GREEN}m"
-ITALICYELLO="\e[3;${YELLO}m"
+ITALICYELLOW="\e[3;${YELLOW}m"
 BOLDRED="\e[1;${RED}m"
 ENDCOLOR="\e[0m"
 echo -e "${BOLDRED}"
@@ -21,11 +21,13 @@ cat << "EOF"
 
 EOF
 echo -e "${ENDCOLOR}"
+
+yellow_message(){
+  echo -e "${ITALICYELLOW} $1 ${ENDCOLOR}"
+}
+
 green_prompt() {
   read -ep "$(echo -e "${BOLDGREEN} $1 ${ENDCOLOR}")" $2
-}
-yello_message(){
-  echo -e "${ITALICYELLO} $1 ${ENDCOLOR}"
 }
 
 # Get user input for PHP version and web server type
@@ -52,7 +54,7 @@ generate_virtualhos_apache() {
     ErrorLog /var/log/apache2/error.log
     CustomLog /var/log/apache2/access.log combined
   </VirtualHost>" >conf/apache-vhost.conf
-  yello_message "Apache virtualhost configuration file generated"
+  yellow_message "Apache virtualhost configuration file generated"
 
 }
 generate_virtualhos_nginx() {
@@ -76,7 +78,7 @@ generate_virtualhos_nginx() {
       fastcgi_index index.php;
     }
   }" >conf/nginx-vhost.conf
-  yello_message "Nginx virtualhost configuration file generated:"
+  yellow_message "Nginx virtualhost configuration file generated:"
 }
 generate_docker_apache() {
   echo "
@@ -308,4 +310,4 @@ fi
 # Create the Docker Compose file
 echo "$COMPOSE_FILE" >docker-compose.yml
 
-yello_message "Docker Compose file generated:"
+yellow_message "Docker Compose file generated:"
