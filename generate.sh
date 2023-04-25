@@ -3,9 +3,9 @@
 
 RED="31"
 GREEN="32"
-YELLO="93"
+YELLOW="93"
 BOLDGREEN="\e[1;${GREEN}m"
-ITALICYELLO="\e[3;${YELLO}m"
+ITALICYELLOW="\e[3;${YELLOW}m"
 BOLDRED="\e[1;${RED}m"
 ENDCOLOR="\e[0m"
 echo -e "${BOLDRED}"
@@ -21,26 +21,32 @@ cat << "EOF"
 
 EOF
 echo -e "${ENDCOLOR}"
+
+yellow_message(){
+  echo -e "${ITALICYELLOW} $1 ${ENDCOLOR}"
+}
+
 green_prompt() {
   read -ep "$(echo -e "${BOLDGREEN} $1 ${ENDCOLOR}")" $2
-}
-yello_message(){
-  echo -e "${ITALICYELLO} $1 ${ENDCOLOR}"
+  [[ -z "${!2}" && -n "$3" ]] && { 
+      yellow_message "Using default value: $3"
+        eval $2="$3"
+    }
 }
 
 # Get user input for PHP version and web server type
-green_prompt "Enter Project name:"  PROJECT_NAME
+green_prompt "Enter Project name:"  PROJECT_NAME test
 
-green_prompt "Enter PHP version (e.g. 7.4): " PHP_VERSION
-green_prompt "Enter web server type (e.g. apache, nginx): " WEB_SERVER
-green_prompt "Enter public path ( from root folder e.g. public): " PUBLIC_PATH
-green_prompt "Enter server name (e.g. example.com): " SERVER_NAME
+green_prompt "Enter PHP version (e.g. 7.4): " PHP_VERSION 7.4
+green_prompt "Enter web server type (e.g. apache, nginx): " WEB_SERVER nginx
+green_prompt "Enter public path ( from root folder e.g. public): " PUBLIC_PATH public
+green_prompt "Enter server name (e.g. example.com): " SERVER_NAME example.com
 # Prompt user to select database options
-green_prompt "Select database options (separate by comma, e.g. mysql,postgres,mongodb):" DATABASE_OPTIONS
+green_prompt "Select database options (separate by comma, e.g. mysql,postgres,mongodb):" DATABASE_OPTIONS postgres
 
 # Check if Redis should be included
 INCLUDE_REDIS=false
-green_prompt "Include Redis? (y/n)" INCLUDE_REDIS_RESPONSE
+green_prompt "Include Redis? (y/n)" INCLUDE_REDIS_RESPONSE n
 if [[ $INCLUDE_REDIS_RESPONSE =~ ^[Yy]$ ]]; then
   INCLUDE_REDIS=true
 fi
@@ -52,7 +58,7 @@ generate_virtualhos_apache() {
     ErrorLog /var/log/apache2/error.log
     CustomLog /var/log/apache2/access.log combined
   </VirtualHost>" >conf/apache-vhost.conf
-  yello_message "Apache virtualhost configuration file generated"
+  yellow_message "Apache virtualhost configuration file generated"
 
 }
 generate_virtualhos_nginx() {
@@ -76,7 +82,7 @@ generate_virtualhos_nginx() {
       fastcgi_index index.php;
     }
   }" >conf/nginx-vhost.conf
-  yello_message "Nginx virtualhost configuration file generated:"
+  yellow_message "Nginx virtualhost configuration file generated:"
 }
 generate_docker_apache() {
   echo "
@@ -219,10 +225,10 @@ RUN apt-get update && apt-get upgrade -y
 
 }
 generate_docker_mysql() {
-  green_prompt "Enter MySQL root password: " MYSQL_ROOT_PASSWORD
-  green_prompt "Enter MySQL database name: " MYSQL_DATABASE
-  green_prompt "Enter MySQL username: " MYSQL_USER
-  green_prompt "Enter MySQL user password: " MYSQL_PASSWORD
+  green_prompt "Enter MySQL root password: " MYSQL_ROOT_PASSWORD password
+  green_prompt "Enter MySQL database name: " MYSQL_DATABASE password
+  green_prompt "Enter MySQL username: " MYSQL_USER password
+  green_prompt "Enter MySQL user password: " MYSQL_PASSWORD password
   COMPOSE_FILE+="
   mysql:
     image: mysql:latest
@@ -240,7 +246,7 @@ generate_docker_mysql() {
   "
 }
 generate_docker_postgres() {
-  green_prompt "Enter PostgreSQL root password: " POSTGRES_PASSWORD
+  green_prompt "Enter PostgreSQL root password: " POSTGRES_PASSWORD password
   COMPOSE_FILE+="
   postgres:
     image: postgres:latest
@@ -308,4 +314,4 @@ fi
 # Create the Docker Compose file
 echo "$COMPOSE_FILE" >docker-compose.yml
 
-yello_message "Docker Compose file generated:"
+yellow_message "Docker Compose file generated:"
